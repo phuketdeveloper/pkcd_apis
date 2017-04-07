@@ -78,7 +78,7 @@ router.post('/fbsignin', (req, res) => {
     if (err)  return res.status(500).send(err)
     if (user) return res.json(user)
 
-    let user = new FacebookUser({
+    let fbuser = new FacebookUser({
       name:       body.name,
       email:      body.email,
       facebookId: body.facebookId,
@@ -87,7 +87,7 @@ router.post('/fbsignin', (req, res) => {
       type:       'facebook'
     })
 
-    user.save((err, user) => {
+    fbuser.save((err, user) => {
       if (err) return res.status(500).send(err)
       res.json(user)
     })
