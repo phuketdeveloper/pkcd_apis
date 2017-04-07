@@ -12,7 +12,6 @@ const jwt      = require('jsonwebtoken')
 const multer   = require('multer')
 const passport = require('passport')
 const _        = require('underscore')
-const graph    = require('fbgraph')
 
 router.post('/signup', multer().single('avatar'), (req, res) => {
   let body = req.body
@@ -41,7 +40,7 @@ router.post('/signup', multer().single('avatar'), (req, res) => {
       })
     }
   }, (err, results) => {
-    if (results.user) return res.status(500).send("Email is already used.")
+    if (results.user) return res.status(500).send("Email has been used.")
 
     let user = new PKCDUser({
       name:     body.name,
@@ -70,8 +69,29 @@ router.post('/signin', passport.authenticate('local'), (req, res) => {
   })
 })
 
-router.post('/fbsignin', passport.authenticate('facebook-token'), (req, res) => {
-  res.json(req.user)
+router.post('/fbsignin', (req, res) => {
+  let body = req.body
+
+  FacebookUser
+  .findOne({ facebookId: body.facebookId })
+  .exec((err, user) => {
+    if (err)  return res.status(500).send(err)
+    if (user) return res.json(user)
+
+    let user = new FacebookUser({
+      name:       body.name,
+      email:      body.email,
+      facebookId: body.facebookId,
+      avatar:     body.avatar,
+      token:      jwt.sign(body.facebookId, '<secret>'),
+      type:       'facebook'
+    })
+
+    user.save((err, user) => {
+      if (err) return res.status(500).send(err)
+      res.json(user)
+    })
+  })
 })
 
 router.post('/signup/admin', (req, res) => {

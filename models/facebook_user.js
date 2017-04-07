@@ -9,6 +9,7 @@ const options = {
 }
 
 const FacebookUser = new Schema({
+  email:      { type: String },
   facebookId: { type: String, required: true },
   avatar:     { type: String }
 }, options)
