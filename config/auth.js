@@ -41,7 +41,7 @@ module.exports = (app, passport) => {
   }))
 
   passport.use(new BearerStrategy({}, (token, callback) => {
-    PKCDUser
+    User
     .findOne({ token: token })
     .exec((err, user) => {
       if (err)   return callback(err)
